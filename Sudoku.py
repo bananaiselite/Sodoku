@@ -1,6 +1,6 @@
 from tkinter import *
 import datetime
-
+from sudoku_solver.slover import solve
 root = Tk()
 root.geometry('505x640')
 
@@ -27,7 +27,6 @@ class Launch:
         file.add_command(label='Exit', command=master.quit)
 
         # Front-End Button
-        s = SolveSudoku()
         check_btn = Button(text='check', command=self.solveInput)
         check_btn.place(anchor='sw', x=10, y=560)
         clear_btn = Button(text='clear', command=self.clearAll)
@@ -41,7 +40,6 @@ class Launch:
             self.currentBoard.append([])
             for j in range(10):
                 self.currentBoard[i].append(0)
-        self.solutionProvider = SolveSudoku()
 
     def easy_board(self):
 
@@ -232,10 +230,10 @@ class Launch:
         if self.started and self.check:
             bn = self.convertToBoard()
             bo = self.convertToBoard()
-            self.solutionProvider.solve(bo)
-            s = SolveSudoku()
+            solve(bo)
+            s = solve(bo)
             while True:
-                find = s.find_empty(bn)
+                find = self.find_empty(bn)
                 if not find:
                     break
                 bn[find[0]][find[1]] = bo[find[0]][find[1]]
@@ -244,12 +242,17 @@ class Launch:
                 elif savedNumbers[find[0]][find[1]].get() != str(bo[find[0]][find[1]]):
                     self.mistake(find)
 
+    def find_empty(self, board):
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == 0:
+                    return (i, j)
 
         self.check = False
 
     def mistake(self, pos):
         bo = self.convertToBoard()
-        self.solutionProvider.solve(bo)
+        solve(bo)
         print(pos)
         if savedNumbers[pos[0]][pos[1]].get() != bo[pos[0]][pos[1]] :
             self.__table[pos[0]][pos[1]] = Entry(self.master, width=2, font=('Arial', 28), bg='red', cursor='arrow',
@@ -259,57 +262,6 @@ class Launch:
                                        textvar=savedNumbers[pos[0]][pos[1]], justify='center')
             self.__table[pos[0]][pos[1]].grid(row=pos[0], column=pos[1], ipadx=10, ipady=10)
 
-
-
-
-class SolveSudoku:
-    def solve(self, bo):
-        find = self.find_empty(bo)
-        if not find:
-            return True
-        else:
-            (row, col) = find
-            for i in range(1, 10):
-                if self.valid(bo, i, (row, col)):
-                    bo[row][col] = i
-
-                    if self.solve(bo):  # calling solve on new board
-                        return True
-                bo[row][col] = 0
-        return False
-
-    def valid(self, bo, num, pos):
-        """
-        :param bo: Board Matrix
-        :param num: int
-        :param pos:tuple (row ,col)
-        :return:
-        """
-
-        # check row
-        for j in range(len(bo[0])):
-            if bo[pos[0]][j] == num and pos[1] != j:
-                return False
-        # Check column
-        for i in range(len(bo)):
-            if bo[i][pos[1]] == num and pos[0] != i:
-                return False
-        # check box
-        box_x = pos[1] // 3
-        box_y = pos[0] // 3
-
-        for i in range(box_y * 3, box_y * 3 + 3):
-            for j in range(box_x * 3, box_x * 3 + 3):
-                if bo[i][j] == num and (i, j) != pos:
-                    return False
-
-        return True
-
-    def find_empty(self, board):
-        for i in range(len(board)):
-            for j in range(len(board[0])):
-                if board[i][j] == 0:
-                    return (i, j)
 
 
 # Global Matrix where are stored the numbers
