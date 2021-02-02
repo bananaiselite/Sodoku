@@ -169,7 +169,6 @@ class Launch:
                                            textvar=savedNumbers[i][j], justify='center')
                 self.__table[i][j].bind('<Motion>', self.correctGrid)
                 self.__table[i][j].bind('<FocusIn>', self.correctGrid)
-                self.__table[i][j].bind('<Button-1>', self.correctGrid)
                 self.__table[i][j].grid(row=i, column=j, ipadx=10, ipady=10)
                 if hard[i][j] != 0:
                     num = Label(self.master, text=hard[i][j], bg=color, font='Arial 28')
